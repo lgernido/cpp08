@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   Span.hpp                                           :+:      :+:    :+:   */
+/*   MutantStack.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: lgernido <lgernido@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/06/17 09:42:57 by lgernido          #+#    #+#             */
-/*   Updated: 2024/06/20 09:02:40 by lgernido         ###   ########.fr       */
+/*   Created: 2024/06/18 11:18:52 by lgernido          #+#    #+#             */
+/*   Updated: 2024/06/19 10:41:03 by lgernido         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef SPAN_HPP
-#define SPAN_HPP
+#ifndef MUTANTSTACK_HPP
+#define MUTANTSTACK_HPP
 
 /*****************************************************************************/
 /*                                  INCLUDES                                 */
@@ -20,11 +20,13 @@
 #include <iostream>
 #include <cctype>
 #include <exception>
-#include <vector>
+#include <stack>
+#include <deque>
 #include <iterator>
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
+#include <list>
 
 /*****************************************************************************/
 /*                                  COLORS                                   */
@@ -48,65 +50,68 @@
 /*                                  CLASS                                    */
 /*****************************************************************************/
 
-class Span
+template <typename T, typename Container = std::deque<T> >
+class MutantStack : public std::stack<T, Container>
 {
-    public :
-        Span(){};
-        ~Span(){};
-
-        Span(unsigned int N);
-        
-        Span(const Span &other);
-        Span &operator=(const Span &other);
-
-        typedef std::vector<int>::iterator iterator;
-        
-        void addNumber(int nb);
-        int shortestSpan(void);
-        int longestSpan(void);
-        template <typename iter>
-        void addNumbers(iter begin, iter end);
-
-        iterator end() 
+    public:
+        MutantStack(void) : std::stack<T, Container>() {};
+        MutantStack(MutantStack const & src) : std::stack<T, Container>(src) 
         {
-            return tab.end();
+            *this = src;
+        };
+        MutantStack &operator=(MutantStack const &src) 
+        {
+            std::stack<T, Container>::operator=(src);
+            return *this;
+        }
+        ~MutantStack() 
+        {
+            std::cout << "Destructor called" << std::endl;
+        };
+        
+        typedef typename Container::iterator iterator;
+        typedef typename Container::const_iterator const_iterator;
+        typedef typename Container::reverse_iterator reverse_iterator;
+        typedef typename Container::const_reverse_iterator const_reverse_iterator;
+        iterator begin(void) 
+        {
+            return this->c.begin();
+        }
+        iterator end(void) 
+        {
+            return this->c.end();
+        }
+        reverse_iterator rbegin() 
+        {
+            return this->c.rbegin();
         }
 
-        unsigned int getN(void);
-
-        class SpanIsFull : public std::exception 
+        reverse_iterator rend() 
         {
-            public:
-                virtual const char *what() const throw() 
-                {
-                    return ("Span: Vector is already full");
-                }
-        };
+            return this->c.rend();
+        }
 
-        class WrongContainer : public std::exception 
+        const_iterator cbegin() const 
         {
-            public:
-                virtual const char *what() const throw() 
-                {
-                    return ("Span: Can't compute a span for this vector");
-                }
-        };
+            return this->c.cbegin();
+        }
 
+        const_iterator cend() const 
+        {
+            return this->c.cend();
+        }
+
+        const_reverse_iterator crbegin() const 
+        {
+            return this->c.crbegin();
+        }
+
+        const_reverse_iterator crend() const 
+        {
+            return this->c.crend();
+        }
+    
     private :
-        unsigned int N;
-        std::vector<int> tab;
-
-    protected :
 };
-
-/*****************************************************************************/
-/*                                  TEMPLATES                                */
-/*****************************************************************************/
-
-template <typename iter>
-void Span::addNumbers(iter begin, iter end) 
-{
-    tab.insert(tab.end(), begin, end);
-}
 
 #endif
